@@ -1,0 +1,2 @@
+#define IDI_TERRAIN_GENERATOR 101
+IDI_TERRAIN_GENERATOR ICON "terrain_generator.ico"
