@@ -205,6 +205,16 @@ For byte-stable output, preserve this ordering:
 
 Use comma-separated values with no added spaces. Serialize decimal heights with enough precision to round-trip a `double` (`15` significant digits is used here). Parse integer seeds as unsigned 32-bit values.
 
+## Generated level files
+
+When level-file export is enabled, create one `.nw` file for every generated level name next to the `.gmap`. A level with no local edit is a valid minimal level:
+
+```text
+GLEVNW01
+```
+
+If a level has a local 9 by 9 override, append its `HEIGHTS` block to that header. The map still owns the shared terrain and seeds; the level file stores only the independent local override.
+
 ## Preview colors
 
 The preview shades a quad from four neighboring heights. First compute their average and select a terrain band:
