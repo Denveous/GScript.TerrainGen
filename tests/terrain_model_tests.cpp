@@ -6,6 +6,8 @@
 #include <fstream>
 #include <iterator>
 #include <array>
+#undef assert
+#define assert(expression) do { if (!(expression)) return 1; } while (false)
 int terrain_self_test() {
   terrain::Terrain map(2, 2);
   map.level(1, 1).at(8, 8) = 42.5;
@@ -57,6 +59,11 @@ int terrain_self_test() {
   assert(override_document.height_overrides.size() == 1);
   assert(override_document.height_overrides[0].level_name == "one_aa.nw");
   assert(override_document.height_overrides[0].samples[80] == 9.0);
+  const std::array<double, 81> empty_level{};
+  assert(terrain::serialize_terrain_level(empty_level, false) == "GLEVNW01\n");
+  const auto level_text = terrain::serialize_terrain_level(override_document.height_overrides[0].samples, true);
+  assert(level_text.starts_with("GLEVNW01\nHEIGHTS\n1,2,3,4,5,6,7,8,9\n"));
+  assert(level_text.ends_with("1,2,3,4,5,6,7,8,9\nHEIGHTSEND\n"));
   std::array<double, 4> controls{0.0, 64.0, 128.0, 192.0};
   std::array<double, 81> overrides{};
   std::vector<double> generated_level;

@@ -180,4 +180,19 @@ namespace terrain {
     }
     return output.str();
   }
+  std::string serialize_terrain_level(std::span<const double, 81> heights, bool include_heights) {
+    std::ostringstream output;
+    output << "GLEVNW01\n";
+    if (!include_heights) return output.str();
+    output << "HEIGHTS\n";
+    for (int row = 0; row < 9; ++row) {
+      for (int column = 0; column < 9; ++column) {
+        if (column) output << ',';
+        output << delphi_decimal(heights[static_cast<std::size_t>(row) * 9 + column]);
+      }
+      output << '\n';
+    }
+    output << "HEIGHTSEND\n";
+    return output.str();
+  }
 }

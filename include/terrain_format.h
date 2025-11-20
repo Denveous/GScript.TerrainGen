@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <span>
 #include <string>
 #include <vector>
 namespace terrain {
@@ -30,4 +31,5 @@ namespace terrain {
   void edit_control_height(TerrainMapDocument& document, int control_x, int control_y, double value);
   std::string generated_level_name(const TerrainMapDocument& document, int level_x, int level_y);
   std::string serialize_terrain_gmap(const TerrainMapDocument& document, bool include_height_overrides = true);
+  std::string serialize_terrain_level(std::span<const double, 81> heights, bool include_heights);
 }
