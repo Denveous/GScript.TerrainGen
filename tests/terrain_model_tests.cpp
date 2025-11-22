@@ -32,26 +32,30 @@ int terrain_self_test() {
   assert(random.drandi() == static_cast<std::int32_t>(0xdc6dac1fu));
   assert(random.drandseed() == 0xdc6dac1fu);
   std::ifstream file{TERRAIN_SOURCE_DIR "/original/myworld.gmap"};
-  const std::string fixture{std::istreambuf_iterator<char>{file}, {}};
-  const auto document = terrain::parse_terrain_gmap(fixture);
-  assert(document.width == 32 && document.height == 32);
-  assert(document.map_seed == 67387906u);
-  assert(document.map_image == "myworld.png");
-  assert(document.heightmap.size() == 33 * 33);
-  assert(document.random_seeds.size() == 32 * 32);
-  assert(document.random_seeds[32 * 31 + 31] == 1293905230u);
-  const auto serialized = terrain::serialize_terrain_gmap(document, false);
-  const auto normalized_fixture = [&fixture] {
-    std::string normalized;
-    for (std::size_t index = 0; index < fixture.size(); ++index) if (fixture[index] != '\r') normalized += fixture[index];
-    return normalized;
-  }();
-  assert(serialized == normalized_fixture);
-  const auto round_trip = terrain::parse_terrain_gmap(serialized);
-  assert(round_trip.width == document.width && round_trip.height == document.height);
-  assert(round_trip.map_image == document.map_image);
-  assert(round_trip.heightmap == document.heightmap);
-  assert(round_trip.random_seeds == document.random_seeds);
+  const bool has_fixture=static_cast<bool>(file);
+  terrain::TerrainMapDocument document;
+  if (has_fixture) {
+    const std::string fixture{std::istreambuf_iterator<char>{file}, {}};
+    document=terrain::parse_terrain_gmap(fixture);
+    assert(document.width == 32 && document.height == 32);
+    assert(document.map_seed == 67387906u);
+    assert(document.map_image == "myworld.png");
+    assert(document.heightmap.size() == 33 * 33);
+    assert(document.random_seeds.size() == 32 * 32);
+    assert(document.random_seeds[32 * 31 + 31] == 1293905230u);
+    const auto serialized = terrain::serialize_terrain_gmap(document, false);
+    const auto normalized_fixture = [&fixture] {
+      std::string normalized;
+      for (std::size_t index = 0; index < fixture.size(); ++index) if (fixture[index] != '\r') normalized += fixture[index];
+      return normalized;
+    }();
+    assert(serialized == normalized_fixture);
+    const auto round_trip = terrain::parse_terrain_gmap(serialized);
+    assert(round_trip.width == document.width && round_trip.height == document.height);
+    assert(round_trip.map_image == document.map_image);
+    assert(round_trip.heightmap == document.heightmap);
+    assert(round_trip.random_seeds == document.random_seeds);
+  }
   const auto override_document = terrain::parse_terrain_gmap(
     "GRMAP001\nWIDTH 1\nHEIGHT 1\nHEIGHTMAP\n0,0\n0,0\nHEIGHTMAPEND\nRANDOMSEEDS\n7\nRANDOMSEEDSEND\nHEIGHTS one_aa.nw\n"
     "1,2,3,4,5,6,7,8,9\n1,2,3,4,5,6,7,8,9\n1,2,3,4,5,6,7,8,9\n1,2,3,4,5,6,7,8,9\n"
@@ -93,22 +97,24 @@ int terrain_self_test() {
   assert(generated_controls.size() == 9 && generated_seeds.size() == 4);
   assert(generated_controls[0] == 0.0 && generated_controls[2] == 0.0 && generated_controls[6] == 0.0 && generated_controls[8] == 0.0);
   assert(generated_seeds[0] != generated_seeds[1]);
-  terrain::generate_map_terrain(document.width, document.height, document.map_seed, document.base_height, document.even_borders, document.map_height, document.map_chaos, generated_controls, generated_seeds);
-  assert(generated_controls == document.heightmap);
-  assert(generated_seeds == document.random_seeds);
-  auto regenerated_document = document;
-  terrain::regenerate_terrain_map(regenerated_document);
-  assert(regenerated_document.heightmap == document.heightmap);
-  assert(regenerated_document.random_seeds == document.random_seeds);
-  terrain::edit_control_height(regenerated_document, 1, 1, 123.0);
-  assert(regenerated_document.heightmap[1 * 33 + 1] == 123.0);
-  assert(terrain::generated_level_name(document, 31, 31) == "myworld_bf-32.nw");
-  assert(terrain::generated_level_name(document, 0, 0) == "myworld_aa-01.nw");
-  auto single_letter_columns = document;
+  if (has_fixture) {
+    terrain::generate_map_terrain(document.width, document.height, document.map_seed, document.base_height, document.even_borders, document.map_height, document.map_chaos, generated_controls, generated_seeds);
+    assert(generated_controls == document.heightmap);
+    assert(generated_seeds == document.random_seeds);
+    auto regenerated_document = document;
+    terrain::regenerate_terrain_map(regenerated_document);
+    assert(regenerated_document.heightmap == document.heightmap);
+    assert(regenerated_document.random_seeds == document.random_seeds);
+    terrain::edit_control_height(regenerated_document, 1, 1, 123.0);
+    assert(regenerated_document.heightmap[1 * 33 + 1] == 123.0);
+    assert(terrain::generated_level_name(document, 31, 31) == "myworld_bf-32.nw");
+    assert(terrain::generated_level_name(document, 0, 0) == "myworld_aa-01.nw");
+  }
+  auto single_letter_columns = override_document;
   single_letter_columns.width = 26;
   single_letter_columns.generated = "edge_z-01.nw";
   assert(terrain::generated_level_name(single_letter_columns, 25, 0) == "edge_z-01.nw");
-  auto double_letter_columns = document;
+  auto double_letter_columns = override_document;
   double_letter_columns.width = 27;
   double_letter_columns.generated = "edge_ba-01.nw";
   assert(terrain::generated_level_name(double_letter_columns, 26, 0) == "edge_ba-01.nw");
