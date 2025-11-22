@@ -215,6 +215,8 @@ GLEVNW01
 
 If a level has a local 9 by 9 override, append its `HEIGHTS` block to that header. The map still owns the shared terrain and seeds; the level file stores only the independent local override.
 
+For a new save, derive `GENERATED` from the chosen map filename. For example, saving a 32 by 32 map as `myworld.gmap` produces `GENERATED myworld_bf-32.nw`, then emits `myworld_aa-01.nw` through `myworld_bf-32.nw`.
+
 ## Preview colors
 
 The preview shades a quad from four neighboring heights. First compute their average and select a terrain band:
