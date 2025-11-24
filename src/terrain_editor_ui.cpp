@@ -51,7 +51,7 @@ int terrain_self_test();
 int main(int argument_count, char** arguments) {
   if (argument_count == 2 && std::string_view(arguments[1]) == "--self-test") return terrain_self_test();
   if (argument_count > 1) return terrain_cli_main(argument_count, arguments);
-  SetConfigFlags(FLAG_WINDOW_RESIZABLE); InitWindow(window_width,window_height,"Terrain Generator");
+  InitWindow(window_width,window_height,"Terrain Generator");
 #if defined(_WIN32)
   set_window_icon();
 #endif
