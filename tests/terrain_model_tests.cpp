@@ -93,5 +93,13 @@ int terrain_self_test() {
   assert(regenerated_document.heightmap[1 * 33 + 1] == 123.0);
   assert(terrain::generated_level_name(document, 31, 31) == "myworld_bf-32.nw");
   assert(terrain::generated_level_name(document, 0, 0) == "myworld_aa-01.nw");
+  auto single_letter_columns = document;
+  single_letter_columns.width = 26;
+  single_letter_columns.generated = "edge_z-01.nw";
+  assert(terrain::generated_level_name(single_letter_columns, 25, 0) == "edge_z-01.nw");
+  auto double_letter_columns = document;
+  double_letter_columns.width = 27;
+  double_letter_columns.generated = "edge_ba-01.nw";
+  assert(terrain::generated_level_name(double_letter_columns, 26, 0) == "edge_ba-01.nw");
   return 0;
 }

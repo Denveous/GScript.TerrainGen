@@ -127,7 +127,8 @@ namespace terrain {
   }
   std::string generated_level_name(const TerrainMapDocument& document, int level_x, int level_y) {
     if (level_x < 0 || level_y < 0 || level_x >= document.width || level_y >= document.height || document.generated.size() < 4 || document.generated.substr(document.generated.size() - 3) != ".nw") return {};
-    const int column_digits = static_cast<int>(std::floor(std::log(static_cast<double>(document.width)) / std::log(26.0))) + 1;
+    int column_digits = 1;
+    for (int capacity = 26; capacity < document.width; capacity *= 26) ++column_digits;
     const int row_digits = static_cast<int>(std::floor(std::log10(static_cast<double>(document.height)))) + 1;
     const auto base = document.generated.substr(0, document.generated.size() - 3);
     if (static_cast<int>(base.size()) < column_digits + row_digits) return {};
