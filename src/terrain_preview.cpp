@@ -24,8 +24,8 @@ namespace terrain {
     else color = {224, 240, 240};
     if (!slope_lighting) return color;
     // The legacy preview uses the north/south difference, not a normal vector.
-    // Keep the darkest water readable; the preview shades terrain but never turns it black.
-    const int light = std::clamp(static_cast<int>(std::llround(((bottom_left + bottom_right) - (top_left + top_right)) * 16.0)), -48, 47);
+    // Deep water receives only the bright half of the slope shade, preserving its base blue-green.
+    const int light = std::clamp(static_cast<int>(std::llround(((bottom_left + bottom_right) - (top_left + top_right)) * 16.0)), average < -8.0 ? 0 : -96, 95);
     return {channel(color.red + light), channel(color.green + light), channel(color.blue + light)};
   }
 }
