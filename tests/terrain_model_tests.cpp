@@ -78,9 +78,15 @@ int terrain_self_test() {
   terrain::generate_level_terrain(controls, 1, 1, 0, 0, 7, 11, 5.0, 0.6, 5.0544, 0.6, level_override, true, generated_level);
   assert(generated_level[32 * 65 + 32] == level_override[4 * 9 + 4]);
   const auto grass = terrain::preview_color(10.0, 10.0, 10.0, 10.0, false);
-  assert(grass.red == 0 && grass.green == 224 && grass.blue == 0);
+  assert(grass.red == 0 && grass.green == 212 && grass.blue == 0);
   const auto lit_grass = terrain::preview_color(10.0, 10.0, 11.0, 11.0, true);
-  assert(lit_grass.green == 255);
+  assert(lit_grass.green == 245);
+  const auto high_grass = terrain::preview_color(40.0, 40.0, 40.0, 40.0, false);
+  assert(high_grass.red == 0 && high_grass.green == 159 && high_grass.blue == 0);
+  const auto mountain = terrain::preview_color(60.0, 60.0, 60.0, 60.0, false);
+  assert(mountain.red == 143 && mountain.green == 0 && mountain.blue == 0);
+  const auto snow = terrain::preview_color(65.0, 65.0, 65.0, 65.0, false);
+  assert(snow.red == 192 && snow.green == 224 && snow.blue == 224);
   std::vector<double> generated_controls;
   std::vector<std::uint32_t> generated_seeds;
   terrain::generate_map_terrain(2, 2, 67387906u, 0.0, false, 65.0, 0.6, generated_controls, generated_seeds);
@@ -111,6 +117,6 @@ int terrain_self_test() {
   assert(override_round_trip.height_overrides[0].level_name == "one_aa.nw");
   assert(override_round_trip.height_overrides[0].samples == override_document.height_overrides[0].samples);
   const auto deep_water = terrain::preview_color(-40.0, -40.0, -80.0, -80.0, true);
-  assert(deep_water.red == 0 && deep_water.green >= 80 && deep_water.blue >= 111);
+  assert(deep_water.red == 0 && deep_water.green == 80 && deep_water.blue == 111);
   return 0;
 }
