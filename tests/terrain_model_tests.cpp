@@ -101,5 +101,11 @@ int terrain_self_test() {
   double_letter_columns.width = 27;
   double_letter_columns.generated = "edge_ba-01.nw";
   assert(terrain::generated_level_name(double_letter_columns, 26, 0) == "edge_ba-01.nw");
+  const auto override_round_trip = terrain::parse_terrain_gmap(terrain::serialize_terrain_gmap(override_document));
+  assert(override_round_trip.height_overrides.size() == 1);
+  assert(override_round_trip.height_overrides[0].level_name == "one_aa.nw");
+  assert(override_round_trip.height_overrides[0].samples == override_document.height_overrides[0].samples);
+  const auto deep_water = terrain::preview_color(-40.0, -40.0, -80.0, -80.0, true);
+  assert(deep_water.red == 0 && deep_water.green >= 80 && deep_water.blue >= 111);
   return 0;
 }
