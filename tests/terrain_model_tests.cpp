@@ -72,6 +72,11 @@ int terrain_self_test() {
   assert(generated_level[0] == 0.0 && generated_level[64] == 64.0);
   assert(generated_level[64 * 65] == 128.0 && generated_level[64 * 65 + 64] == 192.0);
   assert(generated_level[32 * 65 + 32] != 0.0);
+  std::array<double, 81> level_override{};
+  for (int y = 0; y <= 8; ++y) for (int x = 0; x <= 8; ++x) level_override[y * 9 + x] = generated_level[(y * 8) * 65 + x * 8];
+  level_override[4 * 9 + 4] += 12.0;
+  terrain::generate_level_terrain(controls, 1, 1, 0, 0, 7, 11, 5.0, 0.6, 5.0544, 0.6, level_override, true, generated_level);
+  assert(generated_level[32 * 65 + 32] == level_override[4 * 9 + 4]);
   const auto grass = terrain::preview_color(10.0, 10.0, 10.0, 10.0, false);
   assert(grass.red == 0 && grass.green == 224 && grass.blue == 0);
   const auto lit_grass = terrain::preview_color(10.0, 10.0, 11.0, 11.0, true);
