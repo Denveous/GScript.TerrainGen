@@ -13,7 +13,7 @@
 #include <raymath.h>
 #include <tinyfiledialogs.h>
 namespace {
-  constexpr int window_width = 674, window_height = 515, panel_x = 482, titlebar_height = 30, frame_width = 8;
+  constexpr int window_width = 688, window_height = 522, panel_x = 482, titlebar_height = 30, frame_width = 0;
   constexpr int terrain_left = 20, terrain_top = 70, terrain_width = 442, terrain_height = 440;
   Font ui_font{};
   void ui_text(const char* text, int x, int y, int size, Color color) { DrawTextEx(ui_font, text, Vector2{static_cast<float>(x),static_cast<float>(y)}, static_cast<float>(size), 1, color); }
