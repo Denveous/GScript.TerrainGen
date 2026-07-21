@@ -126,6 +126,8 @@ int terrain_self_test() {
   assert(override_round_trip.height_overrides[0].level_name == "one_aa.nw");
   assert(override_round_trip.height_overrides[0].samples == override_document.height_overrides[0].samples);
   const auto deep_water = terrain::preview_color(-40.0, -40.0, -80.0, -80.0, true);
-  assert(deep_water.red == 0 && deep_water.green == 80 && deep_water.blue == 111);
+  assert(deep_water.red == 0 && deep_water.green == 0 && deep_water.blue == 15);
+  const auto half_step_light = terrain::preview_color(10.0, 10.0, 10.015625, 10.015625, true);
+  assert(half_step_light.red == 0 && half_step_light.green == 212 && half_step_light.blue == 0);
   return 0;
 }

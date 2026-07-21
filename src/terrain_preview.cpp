@@ -24,9 +24,8 @@ namespace terrain {
     else if (average < 65.0) color={byte(ramp(average,55.0,65.0,95,96)),0,0};
     else { const int value=(std::min)(31,legacy_floor(average-65.0)); color={byte(value+192),byte(value+224),byte(value+224)}; }
     if (!slope_lighting) return color;
-    // The legacy preview uses the north/south difference, not a normal vector.
-    // Deep water receives only the bright half of the slope shade, preserving its base blue-green.
-    const int light = std::clamp(static_cast<int>(std::llround(((bottom_left + bottom_right) - (top_left + top_right)) * 16.0)), average < -8.0 ? 0 : -96, 95);
+    // The preview shades every terrain band from the north/south height difference.
+    const int light = std::clamp(static_cast<int>(std::nearbyint(((bottom_left + bottom_right) - (top_left + top_right)) * 16.0)), -96, 95);
     return {channel(color.red + light), channel(color.green + light), channel(color.blue + light)};
   }
 }
