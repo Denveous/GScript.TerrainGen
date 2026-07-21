@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iterator>
 #include <array>
+#include <cmath>
 #undef assert
 #define assert(expression) do { if (!(expression)) return 1; } while (false)
 int terrain_self_test() {
@@ -105,6 +106,8 @@ int terrain_self_test() {
     terrain::regenerate_terrain_map(regenerated_document);
     assert(regenerated_document.heightmap == document.heightmap);
     assert(regenerated_document.random_seeds == document.random_seeds);
+    assert(std::abs(regenerated_document.level_height - 5.0544) < 0.0000000001);
+    assert(regenerated_document.level_chaos == document.map_chaos);
     terrain::edit_control_height(regenerated_document, 1, 1, 123.0);
     assert(regenerated_document.heightmap[1 * 33 + 1] == 123.0);
     assert(terrain::generated_level_name(document, 31, 31) == "myworld_bf-32.nw");

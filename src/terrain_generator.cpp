@@ -75,7 +75,7 @@ namespace terrain {
     // The legacy nested loop is x-major although the saved array is y * width + x.
     for (int x = 0; x < map_width; ++x) for (int y = 0; y < map_height; ++y) level_seeds[y * map_width + x] = static_cast<std::uint32_t>(random.drand() * 2147483647.0);
   }
-  TerrainBorders generate_map_borders(std::span<const double> map_controls, int map_width, int map_height, std::uint32_t map_seed, double map_height_deviation, double map_chaos) {
+  TerrainBorders generate_map_borders(std::span<const double> map_controls, int map_width, int map_height, std::uint32_t map_seed, double level_height, double level_chaos) {
     if (map_width <= 0 || map_height <= 0 || map_controls.size() != static_cast<std::size_t>(map_width + 1) * (map_height + 1)) throw std::out_of_range("terrain map bounds");
     TerrainBorders borders{.horizontal = std::vector<double>(static_cast<std::size_t>(map_width * 64 + 1) * (map_height + 1)), .vertical = std::vector<double>(static_cast<std::size_t>(map_height * 64 + 1) * (map_width + 1))};
     const auto control = [&](int x, int y) { return map_controls[y * (map_width + 1) + x]; };
@@ -87,8 +87,8 @@ namespace terrain {
       borders.vertical[y * 64 * (map_width + 1) + x] = control(x, y);
     }
     for (int x = 0; x <= map_width; ++x) for (int y = 0; y <= map_height; ++y) {
-      if (x < map_width) generate_midpoint(borders.horizontal, map_width * 64 + 1, map_random, map_chaos, map_height_deviation, y, (x + 1) * 64, y, x * 64);
-      if (y < map_height) generate_midpoint(borders.vertical, map_width + 1, map_random, map_chaos, map_height_deviation, (y + 1) * 64, x, y * 64, x);
+      if (x < map_width) generate_midpoint(borders.horizontal, map_width * 64 + 1, map_random, level_chaos, level_height, y, (x + 1) * 64, y, x * 64);
+      if (y < map_height) generate_midpoint(borders.vertical, map_width + 1, map_random, level_chaos, level_height, (y + 1) * 64, x, y * 64, x);
     }
     return borders;
   }
@@ -107,6 +107,6 @@ namespace terrain {
     if (apply_height_overrides) apply_overrides(output, overrides);
   }
   void generate_level_terrain(std::span<const double> map_controls, int map_width, int map_height, int level_x, int level_y, std::uint32_t map_seed, std::uint32_t level_seed, double map_height_deviation, double map_chaos, double level_height, double level_chaos, std::span<const double, 81> overrides, bool apply_height_overrides, std::vector<double>& output) {
-    generate_level_terrain(generate_map_borders(map_controls, map_width, map_height, map_seed, map_height_deviation, map_chaos), map_width, map_height, level_x, level_y, level_seed, level_height, level_chaos, overrides, apply_height_overrides, output);
+    generate_level_terrain(generate_map_borders(map_controls, map_width, map_height, map_seed, level_height, level_chaos), map_width, map_height, level_x, level_y, level_seed, level_height, level_chaos, overrides, apply_height_overrides, output);
   }
 }

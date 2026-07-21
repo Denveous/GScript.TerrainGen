@@ -117,6 +117,8 @@ namespace terrain {
     // This is the same state transition as Generate World: controls and local
     // seeds are replaced together so every generated level remains deterministic.
     generate_map_terrain(document.width, document.height, document.map_seed, document.base_height, document.even_borders, document.map_height, document.map_chaos, document.heightmap, document.random_seeds);
+    document.level_height = document.map_height * std::pow(document.map_chaos, std::log2(document.width));
+    document.level_chaos = document.map_chaos;
     document.height_overrides.clear();
   }
   void edit_control_height(TerrainMapDocument& document, int control_x, int control_y, double value) {

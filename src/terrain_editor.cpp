@@ -28,7 +28,7 @@ namespace {
     std::vector<terrain::PreviewColor> pixels(static_cast<std::size_t>(width) * height);
     std::array<double, 81> no_override{};
     std::vector<double> level;
-    const auto borders = terrain::generate_map_borders(document.heightmap, document.width, document.height, document.map_seed, document.map_height, document.map_chaos);
+    const auto borders = terrain::generate_map_borders(document.heightmap, document.width, document.height, document.map_seed, document.level_height, document.level_chaos);
     for (int y = 0; y < document.height; ++y) for (int x = 0; x < document.width; ++x) {
       const auto level_name = terrain::generated_level_name(document, x, y);
       const auto override = std::find_if(document.height_overrides.begin(), document.height_overrides.end(), [&level_name](const terrain::TerrainLevelOverride& item) {

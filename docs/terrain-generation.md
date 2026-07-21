@@ -7,7 +7,7 @@ This document describes the deterministic terrain pipeline implemented by Terrai
 | Stage | Input | Output | Purpose |
 | --- | --- | --- | --- |
 | Map generation | Generator settings and `GENSEED` | `(width + 1) x (height + 1)` control grid and one seed per level | Establishes the shared terrain shape and local-detail streams. |
-| Border expansion | Control grid and `GENSEED` | Continuous 65-sample borders for every level | Makes adjacent levels meet exactly. |
+| Border expansion | Control grid, `GENSEED`, and level settings | Continuous 65-sample borders for every level | Makes adjacent levels meet exactly. |
 | Level generation | Four borders, a per-level seed, level settings | A `65 x 65` height field | Adds deterministic local detail inside a level. |
 | Optional overrides | A `9 x 9` control patch | Modified local height field | Applies saved manual edits smoothly across the level. |
 | Preview | Four nearby samples | A terrain color | Produces the editor's projected terrain view. |
@@ -67,6 +67,7 @@ It stops when both dimensions are at most one cell. `quadrant` first fills the h
 | Function | Initial chaos | Decay per recursive depth |
 | --- | ---: | ---: |
 | Map perimeter and map quadrant | `GENHEIGHT` | `GENCHAOS` |
+| Shared 64-sample border segments | `LEVHEIGHT` | `LEVCHAOS` |
 | Level interior | `LEVHEIGHT * LEVCHAOS` | `LEVCHAOS` |
 
 The calculation intentionally uses `double` until control values are finalized.
@@ -125,6 +126,15 @@ for x in 0 .. width:
 ```
 
 This uses a new stream initialized from `GENSEED`, shared by all segments. Reinitializing it for every level breaks continuity at the shared borders.
+
+Generate World derives the detail settings before expanding those borders:
+
+```text
+LEVHEIGHT = GENHEIGHT * GENCHAOS ^ log2(WIDTH)
+LEVCHAOS  = GENCHAOS
+```
+
+For the standard `32 x 32` settings, `LEVHEIGHT = 65 * 0.6^5 = 5.0544`. Using `GENHEIGHT` directly for dense borders makes detail displacement about thirteen times too large.
 
 To construct a level:
 
