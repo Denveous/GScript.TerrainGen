@@ -18,13 +18,16 @@ jobs:
         include:
           - os: windows-latest
             artifact: TerrainGenerator-windows-x64
-            executable: bin/TerrainGenerator.exe
+            binary: TerrainGenerator.exe
+            package: TerrainGenerator-windows-x64.zip
           - os: ubuntu-latest
             artifact: TerrainGenerator-linux-x64
-            executable: bin/TerrainGenerator
+            binary: TerrainGenerator
+            package: TerrainGenerator-linux-x64.tar.gz
           - os: macos-14
             artifact: TerrainGenerator-macos-x64
-            executable: bin/TerrainGenerator
+            binary: TerrainGenerator
+            package: TerrainGenerator-macos-x64.tar.gz
 
     steps:
       - uses: actions/checkout@v5
@@ -42,9 +45,42 @@ jobs:
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
 
-      - name: Upload executable
+      - name: Create package directory
+        run: cmake -E make_directory release
+
+      - name: Package Windows executable
+        if: runner.os == 'Windows'
+        working-directory: bin
+        run: cmake -E tar cf "../release/${{ matrix.package }}" --format=zip "${{ matrix.binary }}"
+
+      - name: Package Unix executable
+        if: runner.os != 'Windows'
+        working-directory: bin
+        run: cmake -E tar czf "../release/${{ matrix.package }}" "${{ matrix.binary }}"
+
+      - name: Upload package
         uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.executable }}
+          path: release/${{ matrix.package }}
           if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v7
+        with:
+          path: release
+          merge-multiple: true
+
+      - name: Tag and publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: build-${{ github.run_number }}
+        run: gh release create "$RELEASE_TAG" release/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "TerrainGenerator build $GITHUB_RUN_NUMBER" --generate-notes --latest
